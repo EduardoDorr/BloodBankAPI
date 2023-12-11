@@ -1,6 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 using BloodBank.Domain.Entities;
+using BloodBank.Domain.ValueObjects;
 
 namespace BloodBank.Infrastructure.Configurations;
 
@@ -10,15 +13,23 @@ internal class BloodStorageConfiguration : BaseEntityConfiguration<BloodStorage>
     {
         base.Configure(builder);
 
-        builder.Property(d => d.BloodType)
-               .HasMaxLength(2)
+        builder.Property(b => b.AmountInML)
                .IsRequired();
 
-        builder.Property(d => d.RhFactor)
-               .HasMaxLength(10)
-               .IsRequired();
+        builder.OwnsOne(b => b.BloodData,
+            bloodData =>
+            {
+                bloodData.Property(b => b.BloodType)
+                         .HasColumnName("BloodType")
+                         .HasConversion(new EnumToStringConverter<BloodType>())
+                         .HasMaxLength(2)
+                         .IsRequired();
 
-        builder.Property(d => d.AmountInML)
-               .IsRequired();
+                bloodData.Property(b => b.RhFactor)
+                         .HasColumnName("RhFactor")
+                         .HasConversion(new EnumToStringConverter<RhFactor>())
+                         .HasMaxLength(10)
+                         .IsRequired();
+            });       
     }
 }

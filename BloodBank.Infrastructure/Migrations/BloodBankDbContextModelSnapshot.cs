@@ -22,48 +22,6 @@ namespace BloodBank.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("BloodBank.Domain.Entities.Address", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("PostalCode")
-                        .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("nvarchar(8)");
-
-                    b.Property<string>("State")
-                        .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
-
-                    b.Property<string>("Street")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Addresses");
-                });
-
             modelBuilder.Entity("BloodBank.Domain.Entities.BloodStorage", b =>
                 {
                     b.Property<int>("Id")
@@ -75,21 +33,11 @@ namespace BloodBank.Infrastructure.Migrations
                     b.Property<int>("AmountInML")
                         .HasColumnType("int");
 
-                    b.Property<string>("BloodType")
-                        .IsRequired()
-                        .HasMaxLength(2)
-                        .HasColumnType("nvarchar(2)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
-
-                    b.Property<string>("RhFactor")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime");
@@ -110,11 +58,6 @@ namespace BloodBank.Infrastructure.Migrations
                     b.Property<int>("AmountInML")
                         .HasColumnType("int");
 
-                    b.Property<string>("BloodType")
-                        .IsRequired()
-                        .HasMaxLength(2)
-                        .HasColumnType("nvarchar(2)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime");
 
@@ -126,11 +69,6 @@ namespace BloodBank.Infrastructure.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
-
-                    b.Property<string>("RhFactor")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime");
@@ -150,29 +88,11 @@ namespace BloodBank.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AddressId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("BirthDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("BloodType")
-                        .IsRequired()
-                        .HasMaxLength(2)
-                        .HasColumnType("nvarchar(2)");
+                        .HasColumnType("date");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Gender")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -182,25 +102,46 @@ namespace BloodBank.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("RhFactor")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime");
 
                     b.Property<decimal>("Weight")
-                        .HasColumnType("numeric(3,2)");
+                        .HasColumnType("numeric(5,2)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressId");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
-
                     b.ToTable("Donors");
+                });
+
+            modelBuilder.Entity("BloodBank.Domain.Entities.BloodStorage", b =>
+                {
+                    b.OwnsOne("BloodBank.Domain.ValueObjects.BloodData", "BloodData", b1 =>
+                        {
+                            b1.Property<int>("BloodStorageId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("BloodType")
+                                .IsRequired()
+                                .HasMaxLength(2)
+                                .HasColumnType("nvarchar(2)")
+                                .HasColumnName("BloodType");
+
+                            b1.Property<string>("RhFactor")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("nvarchar(10)")
+                                .HasColumnName("RhFactor");
+
+                            b1.HasKey("BloodStorageId");
+
+                            b1.ToTable("BloodStorage");
+
+                            b1.WithOwner()
+                                .HasForeignKey("BloodStorageId");
+                        });
+
+                    b.Navigation("BloodData")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("BloodBank.Domain.Entities.Donation", b =>
@@ -211,23 +152,153 @@ namespace BloodBank.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.OwnsOne("BloodBank.Domain.ValueObjects.BloodData", "BloodData", b1 =>
+                        {
+                            b1.Property<int>("DonationId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("BloodType")
+                                .IsRequired()
+                                .HasMaxLength(2)
+                                .HasColumnType("nvarchar(2)")
+                                .HasColumnName("BloodType");
+
+                            b1.Property<string>("RhFactor")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("nvarchar(10)")
+                                .HasColumnName("RhFactor");
+
+                            b1.HasKey("DonationId");
+
+                            b1.ToTable("Donations");
+
+                            b1.WithOwner()
+                                .HasForeignKey("DonationId");
+                        });
+
+                    b.Navigation("BloodData")
+                        .IsRequired();
+
                     b.Navigation("Donor");
                 });
 
             modelBuilder.Entity("BloodBank.Domain.Entities.Donor", b =>
                 {
-                    b.HasOne("BloodBank.Domain.Entities.Address", "Address")
-                        .WithMany("Donors")
-                        .HasForeignKey("AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.OwnsOne("BloodBank.Domain.ValueObjects.BloodData", "BloodData", b1 =>
+                        {
+                            b1.Property<int>("DonorId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("BloodType")
+                                .IsRequired()
+                                .HasMaxLength(2)
+                                .HasColumnType("nvarchar(2)")
+                                .HasColumnName("BloodType");
+
+                            b1.Property<string>("RhFactor")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("nvarchar(10)")
+                                .HasColumnName("RhFactor");
+
+                            b1.HasKey("DonorId");
+
+                            b1.ToTable("Donors");
+
+                            b1.WithOwner()
+                                .HasForeignKey("DonorId");
+                        });
+
+                    b.OwnsOne("BloodBank.Domain.ValueObjects.Address", "Address", b1 =>
+                        {
+                            b1.Property<int>("DonorId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)")
+                                .HasColumnName("City");
+
+                            b1.Property<string>("State")
+                                .IsRequired()
+                                .HasMaxLength(25)
+                                .HasColumnType("nvarchar(25)")
+                                .HasColumnName("State");
+
+                            b1.Property<string>("Street")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("nvarchar(100)")
+                                .HasColumnName("Street");
+
+                            b1.Property<string>("ZipCode")
+                                .IsRequired()
+                                .HasMaxLength(8)
+                                .HasColumnType("nvarchar(8)")
+                                .HasColumnName("ZipCode");
+
+                            b1.HasKey("DonorId");
+
+                            b1.ToTable("Donors");
+
+                            b1.WithOwner()
+                                .HasForeignKey("DonorId");
+                        });
+
+                    b.OwnsOne("BloodBank.Domain.ValueObjects.Email", "Email", b1 =>
+                        {
+                            b1.Property<int>("DonorId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Address")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("nvarchar(100)")
+                                .HasColumnName("Email");
+
+                            b1.HasKey("DonorId");
+
+                            b1.HasIndex("Address")
+                                .IsUnique();
+
+                            b1.ToTable("Donors");
+
+                            b1.WithOwner()
+                                .HasForeignKey("DonorId");
+                        });
+
+                    b.OwnsOne("BloodBank.Domain.ValueObjects.Gender", "Gender", b1 =>
+                        {
+                            b1.Property<int>("DonorId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Type")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("nvarchar(10)")
+                                .HasColumnName("Gender");
+
+                            b1.HasKey("DonorId");
+
+                            b1.ToTable("Donors");
+
+                            b1.WithOwner()
+                                .HasForeignKey("DonorId");
+                        });
+
+                    b.Navigation("Address")
                         .IsRequired();
 
-                    b.Navigation("Address");
-                });
+                    b.Navigation("BloodData")
+                        .IsRequired();
 
-            modelBuilder.Entity("BloodBank.Domain.Entities.Address", b =>
-                {
-                    b.Navigation("Donors");
+                    b.Navigation("Email")
+                        .IsRequired();
+
+                    b.Navigation("Gender")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("BloodBank.Domain.Entities.Donor", b =>

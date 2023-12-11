@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 using BloodBank.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
+using BloodBank.Domain.ValueObjects;
 
 namespace BloodBank.Infrastructure.Configurations;
 
@@ -14,41 +16,76 @@ internal class DonorConfiguration : BaseEntityConfiguration<Donor>
         builder.Property(d => d.Name)
                .HasMaxLength(100)
                .IsRequired();
-
-        builder.Property(d => d.Email)
-               .HasMaxLength(100)
-               .IsRequired();
-
-        builder.HasIndex(d => d.Email)
-               .IsUnique();
-
+        
         builder.Property(d => d.BirthDate)
-               .HasColumnType("datetime")
-               .IsRequired();
-
-        builder.Property(d => d.Gender)
-               .HasMaxLength(10)
+               .HasColumnType("date")
                .IsRequired();
 
         builder.Property(d => d.Weight)
-               .HasColumnType("numeric(3,2)")
+               .HasColumnType("numeric(5,2)")
                .IsRequired();
 
-        builder.Property(d => d.BloodType)
-               .HasMaxLength(2)
-               .IsRequired();
+        builder.OwnsOne(d => d.Gender,
+            gender =>
+            {
+                gender.Property(d => d.Type)
+                      .HasColumnName("Gender")
+                      .HasConversion(new EnumToStringConverter<GenderType>())
+                      .HasMaxLength(10)
+                      .IsRequired();
+            });
 
-        builder.Property(d => d.RhFactor)
-               .HasMaxLength(10)
-               .IsRequired();
+        builder.OwnsOne(d => d.BloodData,
+            bloodData =>
+            {
+                bloodData.Property(d => d.BloodType)
+                         .HasColumnName("BloodType")
+                         .HasConversion(new EnumToStringConverter<BloodType>())
+                         .HasMaxLength(2)
+                         .IsRequired();
 
-        builder.Property(d => d.AddressId)
-               .IsRequired();
+                bloodData.Property(d => d.RhFactor)
+                         .HasColumnName("RhFactor")
+                         .HasConversion(new EnumToStringConverter<RhFactor>())
+                         .HasMaxLength(10)
+                         .IsRequired();
+            });
 
-        builder.HasOne(d => d.Address)
-               .WithMany(a => a.Donors)
-               .HasForeignKey(d => d.AddressId)
-               .IsRequired();
+        builder.OwnsOne(d => d.Email,
+            email =>
+            {
+                email.Property(d => d.Address)
+                     .HasColumnName("Email")
+                     .HasMaxLength(100)
+                     .IsRequired();
+
+                email.HasIndex(d => d.Address)
+                     .IsUnique();
+            });
+        
+        builder.OwnsOne(d => d.Address,
+            address =>
+            {
+                address.Property(a => a.Street)
+                       .HasColumnName("Street")
+                       .HasMaxLength(100)
+                       .IsRequired();
+
+                address.Property(a => a.City)
+                       .HasColumnName("City")
+                       .HasMaxLength(50)
+                       .IsRequired();
+
+                address.Property(a => a.State)
+                       .HasColumnName("State")
+                       .HasMaxLength(25)
+                       .IsRequired();
+
+                address.Property(a => a.ZipCode)
+                       .HasColumnName("ZipCode")
+                       .HasMaxLength(8)
+                       .IsRequired();
+            });
 
         builder.HasMany(d => d.Donations)
                .WithOne(a => a.Donor)

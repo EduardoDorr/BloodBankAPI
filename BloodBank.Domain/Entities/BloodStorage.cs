@@ -1,15 +1,17 @@
-﻿namespace BloodBank.Domain.Entities;
+﻿using BloodBank.Domain.ValueObjects;
+
+namespace BloodBank.Domain.Entities;
 
 public class BloodStorage : BaseEntity
 {
-    public string BloodType { get; set; }
-    public string RhFactor { get; set; }
+    public BloodData BloodData { get; set; }
     public int AmountInML { get; set; }
+
+    protected BloodStorage() { }
 
     public BloodStorage(string bloodType, string rhFactor, int amountInML)
     {
-        BloodType = bloodType;
-        RhFactor = rhFactor;
+        BloodData = new BloodData(bloodType, rhFactor);
         AmountInML = amountInML;
 
         CreatedAt = DateTime.Now;
@@ -17,18 +19,30 @@ public class BloodStorage : BaseEntity
         IsActive = true;
     }
 
-    public void AddAmount(int amount)
+    public BloodStorage(BloodData bloodData, int amountInML)
     {
-        AmountInML += amount;
+        BloodData = bloodData;
+        AmountInML = amountInML;
+
+        CreatedAt = DateTime.Now;
+        UpdatedAt = DateTime.Now;
+        IsActive = true;
     }
 
-    public bool WithdrawAmount(int amount)
+    public void AddAmount(int amountInML)
+    {
+        AmountInML += amountInML;
+        UpdatedAt = DateTime.Now;
+    }
+
+    public bool WithdrawAmount(int amountInML)
     {
         if (AmountInML == 0 &&
-            AmountInML - amount < 0)
+            AmountInML - amountInML < 0)
             return false;
 
-        AmountInML -= amount;
+        AmountInML -= amountInML;
+        UpdatedAt = DateTime.Now;
 
         return true;
     }

@@ -1,58 +1,90 @@
-﻿namespace BloodBank.Domain.Entities;
+﻿using BloodBank.Domain.ValueObjects;
+
+namespace BloodBank.Domain.Entities;
 
 public class Donor : BaseEntity
 {
-    public string Name { get; set; }
-    public string Email { get; set; }
-    public DateTime BirthDate { get; set; }
-    public string Gender { get; set; }
-    public double Weight { get; set; }
-    public string BloodType { get; set; }
-    public string RhFactor { get; set; }
-    public int AddressId { get; set; }
+    public string Name { get; private set; }
+    public Email Email { get; private set; }
+    public DateTime BirthDate { get; private set; }
+    public Gender Gender { get; private set; }
+    public double Weight { get; private set; }
+    public BloodData BloodData { get; private set; }
+    public Address Address { get; private set; }
 
-    public virtual Address? Address { get; set; }
     public virtual ICollection<Donation> Donations { get; set; } = new List<Donation>();
 
-    public Donor(string name, string email, DateTime birthDate, string gender, double weight, string bloodType, string rhFactor, int addressId)
+    protected Donor() { }
+
+    public Donor(string name, string email, DateTime birthDate, string gender, double weight, string bloodType, string rhFactor, Address address)
     {
+        if (!HasMinimumWeight(weight))
+            throw new ArgumentException($"Donor must weights at least 50kg");
+
         Name = name;
-        Email = email;
+        Email = new Email(email);
         BirthDate = birthDate;
-        Gender = gender;
+        Gender = new Gender(gender);
         Weight = weight;
-        BloodType = bloodType;
-        RhFactor = rhFactor;
-        AddressId = addressId;
+        BloodData = new BloodData(bloodType, rhFactor);
+        Address = address;
 
         CreatedAt = DateTime.Now;
         UpdatedAt = DateTime.Now;
         IsActive = true;
     }
 
-    public void Update(string name, DateTime birthDate, string gender, double weight, string bloodType, string rhFactor, int addressId, bool isActive)
+    public Donation Donate(int amountInML)
+    {
+        if (IsMinor())
+            throw new Exception("Donor is minor and can't donate");
+
+        if (!CanDonate())
+            throw new Exception("Donor recently donated and can't donate");
+
+        return new Donation(this, amountInML);
+    }
+
+    public void Update(string name, string email, DateTime birthDate, string gender, double weight, string bloodType, string rhFactor, Address address, bool isActive)
     {
         Name = name;
+        Email = new Email(email);
         BirthDate = birthDate;
-        Gender = gender;
+        Gender = new Gender(gender);
         Weight = weight;
-        BloodType = bloodType;
-        RhFactor = rhFactor;
-        AddressId = addressId;
+        BloodData = new BloodData(bloodType, rhFactor);
+        Address = address;
 
         UpdatedAt = DateTime.Now;
         IsActive = isActive;
     }
 
-    public bool CanDonate()
+    private bool CanDonate()
+    {
+        if (!Donations.Any())
+            return true;
+
+        var date = DateTime.Today;
+        var lastDonationDate = Donations.OrderBy(d => d.DonationDate)
+                                        .Last().DonationDate;
+
+        return Gender.Type switch
+        {
+            GenderType.Male => lastDonationDate < date.AddDays(-60),
+            GenderType.Female => lastDonationDate < date.AddDays(-90),
+            _ => false,
+        };
+    }
+
+    private bool IsMinor()
     {
         var dateTime18YearsAgo = DateTime.Today.AddYears(-18);
 
-        return dateTime18YearsAgo >= BirthDate.Date;
+        return BirthDate >= dateTime18YearsAgo;
     }
 
-    public bool HasMinimumWeight()
+    private static bool HasMinimumWeight(double weight)
     {
-        return Weight >= 50;
+        return weight >= 50;
     }
 }

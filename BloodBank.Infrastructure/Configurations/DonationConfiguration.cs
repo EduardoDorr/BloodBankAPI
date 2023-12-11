@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using BloodBank.Domain.Entities;
+using BloodBank.Domain.ValueObjects;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BloodBank.Infrastructure.Configurations;
 
@@ -18,13 +20,21 @@ internal class DonationConfiguration : BaseEntityConfiguration<Donation>
                .HasColumnType("datetime")
                .IsRequired();
 
-        builder.Property(d => d.BloodType)
-               .HasMaxLength(2)
-               .IsRequired();
+        builder.OwnsOne(d => d.BloodData,
+            bloodData =>
+            {
+                bloodData.Property(d => d.BloodType)
+                         .HasColumnName("BloodType")
+                         .HasConversion(new EnumToStringConverter<BloodType>())
+                         .HasMaxLength(2)
+                         .IsRequired();
 
-        builder.Property(d => d.RhFactor)
-               .HasMaxLength(10)
-               .IsRequired();
+                bloodData.Property(d => d.RhFactor)
+                         .HasColumnName("RhFactor")
+                         .HasConversion(new EnumToStringConverter<RhFactor>())
+                         .HasMaxLength(10)
+                         .IsRequired();
+            });
 
         builder.Property(d => d.AmountInML)
                .IsRequired();

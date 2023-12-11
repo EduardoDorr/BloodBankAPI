@@ -1,21 +1,26 @@
-﻿namespace BloodBank.Domain.Entities;
+﻿using BloodBank.Domain.ValueObjects;
+
+namespace BloodBank.Domain.Entities;
 
 public class Donation : BaseEntity
 {
-    public int DonorId { get; set; }
-    public DateTime DonationDate { get; set; }
-    public string BloodType { get; set; }
-    public string RhFactor { get; set; }
-    public int AmountInML { get; set; }
+    public int DonorId { get; private set; }
+    public DateTime DonationDate { get; private set; }
+    public BloodData BloodData { get; private set; }
+    public int AmountInML { get; private set; }
 
     public virtual Donor? Donor { get; set; }
 
-    private Donation(Donor donor, DateTime donationDate, int amountInML)
+    protected Donation() { }
+
+    public Donation(Donor donor, int amountInML)
     {
+        if (!ValidateAmountOfBlood(amountInML))
+            throw new ArgumentOutOfRangeException($"The amount of blood must be between 420 and 470 mL");
+
         DonorId = donor.Id;
-        DonationDate = donationDate;
-        BloodType = donor.BloodType;
-        RhFactor = donor.RhFactor;
+        BloodData = donor.BloodData;
+        DonationDate = DateTime.Now;
         AmountInML = amountInML;
 
         CreatedAt = DateTime.Now;
@@ -23,27 +28,20 @@ public class Donation : BaseEntity
         IsActive = true;
     }
 
-    public Donation? Create(Donor donor, DateTime donationDate, int amountInML)
-    {
-        if (!ValidateAmountOfBlood(amountInML))
-            return null;
-
-        return new Donation(donor, donationDate, amountInML);
-    }
-
     public void Update(Donor donor, DateTime donationDate, int amountInML, bool isActive)
     {
         DonorId = donor.Id;
         DonationDate = donationDate;
-        BloodType = donor.BloodType;
-        RhFactor = donor.RhFactor;
+        BloodData = donor.BloodData;
         AmountInML = amountInML;
 
         UpdatedAt = DateTime.Now;
         IsActive = isActive;
     }
 
-    public bool ValidateAmountOfBlood(int amount)
+    public void SetDonationDate(DateTime donationDate) => DonationDate = donationDate;
+
+    private static bool ValidateAmountOfBlood(int amount)
     {
         return amount >= 420 &&
                amount <= 470;
