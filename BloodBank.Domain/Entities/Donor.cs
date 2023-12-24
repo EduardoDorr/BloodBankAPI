@@ -1,4 +1,5 @@
-﻿using BloodBank.Domain.ValueObjects;
+﻿using BloodBank.Domain.Enums;
+using BloodBank.Domain.ValueObjects;
 
 namespace BloodBank.Domain.Entities;
 
@@ -12,7 +13,7 @@ public class Donor : BaseEntity
     public BloodData BloodData { get; private set; }
     public Address Address { get; private set; }
 
-    public virtual ICollection<Donation> Donations { get; set; } = new List<Donation>();
+    public virtual ICollection<Donation> Donations { get; private set; } = new List<Donation>();
 
     protected Donor() { }
 

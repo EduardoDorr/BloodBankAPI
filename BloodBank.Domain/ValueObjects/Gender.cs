@@ -1,11 +1,6 @@
-﻿namespace BloodBank.Domain.ValueObjects;
+﻿using BloodBank.Domain.Enums;
 
-public enum GenderType
-{
-    Male,
-    Female,
-    Other
-}
+namespace BloodBank.Domain.ValueObjects;
 
 public sealed class Gender : BaseValueObject
 {

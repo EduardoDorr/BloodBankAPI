@@ -1,5 +1,5 @@
-﻿using BloodBank.Domain.Entities;
-using BloodBank.Domain.ValueObjects;
+﻿using BloodBank.Domain.Enums;
+using BloodBank.Domain.Entities;
 
 namespace BloodBank.Domain.Interfaces;
 

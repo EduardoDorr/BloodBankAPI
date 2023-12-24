@@ -25,7 +25,7 @@ public class DonationRepository : IDonationRepository
         return await _context.Donations.SingleOrDefaultAsync(d => d.Id == id);
     }
 
-    public async Task<IEnumerable<Donation>> GetReportWithDonorsAsync(int numberOfDays)
+    public async Task<IEnumerable<Donation>> GetReportWithDonorsAsync(int numberOfDays = 30)
     {
         return await _context.Donations.Include(d => d.Donor)
                                        .Where(d => d.DonationDate >= DateTime.Now.AddDays(-numberOfDays))

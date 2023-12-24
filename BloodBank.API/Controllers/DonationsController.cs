@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-using BloodBank.Application.Donations.Read;
-using BloodBank.Application.Donations.Update;
-using BloodBank.Application.Donations.Create;
-using BloodBank.Application.Donations.Services;
+using MediatR;
+
+using BloodBank.Application.Donations.Models;
+using BloodBank.Application.Donations.Queries;
+using BloodBank.Application.Donations.Commands;
 
 namespace BloodBank.API.Controllers;
 
@@ -11,18 +12,18 @@ namespace BloodBank.API.Controllers;
 [ApiController]
 public class DonationsController : ControllerBase
 {
-    private readonly IDonationService _donationService;
+    private readonly IMediator _mediator;
 
-    public DonationsController(IDonationService donationService)
+    public DonationsController(IMediator mediator)
     {
-        _donationService = donationService;
+        _mediator = mediator;
     }
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<ReadDonationModel>>> GetAll(int skip = 0, int take = 50)
+    public async Task<ActionResult<IEnumerable<GetDonationViewModel>>> GetAll(int skip = 0, int take = 50)
     {
-        var donors = await _donationService.GetAllAsync(skip, take);
+        var donors = await _mediator.Send(new GetDonationsQuery(skip, take));
 
         return Ok(donors);
     }
@@ -30,9 +31,9 @@ public class DonationsController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ReadDonationModel?>> GetById(int id)
+    public async Task<ActionResult<GetDonationViewModel?>> GetById(int id)
     {
-        var donor = await _donationService.GetByIdAsync(id);
+        var donor = await _mediator.Send(new GetDonationQuery(id));
 
         if (donor is null)
             return NotFound();
@@ -42,20 +43,20 @@ public class DonationsController : ControllerBase
 
     [HttpGet("report")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<ReadDonationWithDonorModel?>> GetReportWithDonors(int numberOfDays)
+    public async Task<ActionResult<GetDonationWithDonorViewModel?>> GetReportWithDonors(int numberOfDays = 30)
     {
-        var donor = await _donationService.GetReportWithDonorsAsync(numberOfDays);
+        var donor = await _mediator.Send(new GetReportOfDonationQuery(numberOfDays));
 
         return Ok(donor);
     }
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create([FromBody] CreateDonationInputModel donationInputModel)
+    public async Task<IActionResult> Create([FromBody] CreateDonationCommand command)
     {
-        var donationId = await _donationService.CreateAsync(donationInputModel);
+        var donationId = await _mediator.Send(command);
 
-        return CreatedAtAction(nameof(GetById), new { id = donationId }, donationInputModel);
+        return CreatedAtAction(nameof(GetById), new { id = donationId }, command);
     }
 
     [HttpPut("{id}")]
@@ -63,7 +64,7 @@ public class DonationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateDonationInputModel donationInputModel)
     {
-        var updated = await _donationService.UpdateAsync(id, donationInputModel);
+        var updated = await _mediator.Send(new UpdateDonationCommand(id, donationInputModel));
 
         if (updated)
             return NoContent();

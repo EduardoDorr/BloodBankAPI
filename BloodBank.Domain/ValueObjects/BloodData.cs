@@ -1,18 +1,6 @@
-﻿namespace BloodBank.Domain.ValueObjects;
+﻿using BloodBank.Domain.Enums;
 
-public enum BloodType
-{
-    O,
-    A,
-    B,
-    AB
-}
-
-public enum RhFactor
-{
-    Positive,
-    Negative
-}
+namespace BloodBank.Domain.ValueObjects;
 
 public sealed class BloodData : BaseValueObject
 {

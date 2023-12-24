@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
+using BloodBank.Domain.Enums;
 using BloodBank.Domain.Entities;
-using BloodBank.Domain.ValueObjects;
 
 namespace BloodBank.Infrastructure.Configurations;
 

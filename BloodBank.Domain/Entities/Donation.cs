@@ -9,14 +9,17 @@ public class Donation : BaseEntity
     public BloodData BloodData { get; private set; }
     public int AmountInML { get; private set; }
 
-    public virtual Donor? Donor { get; set; }
+    public virtual Donor? Donor { get; private set; }
+    
+    public static int MinimumAmount => 420;
+    public static int MaximumAmount => 470;
 
     protected Donation() { }
 
     public Donation(Donor donor, int amountInML)
     {
         if (!ValidateAmountOfBlood(amountInML))
-            throw new ArgumentOutOfRangeException($"The amount of blood must be between 420 and 470 mL");
+            throw new ArgumentOutOfRangeException($"The amount of blood must be between {MinimumAmount} and {MaximumAmount} mL");
 
         DonorId = donor.Id;
         BloodData = donor.BloodData;
@@ -28,11 +31,12 @@ public class Donation : BaseEntity
         IsActive = true;
     }
 
-    public void Update(Donor donor, DateTime donationDate, int amountInML, bool isActive)
+    public void Update(DateTime donationDate, int amountInML, bool isActive)
     {
-        DonorId = donor.Id;
+        if (!ValidateAmountOfBlood(amountInML))
+            throw new ArgumentOutOfRangeException($"The amount of blood must be between {MinimumAmount} and {MaximumAmount} mL");
+
         DonationDate = donationDate;
-        BloodData = donor.BloodData;
         AmountInML = amountInML;
 
         UpdatedAt = DateTime.Now;
@@ -43,7 +47,7 @@ public class Donation : BaseEntity
 
     private static bool ValidateAmountOfBlood(int amount)
     {
-        return amount >= 420 &&
-               amount <= 470;
+        return amount >= MinimumAmount &&
+               amount <= MaximumAmount;
     }
 }

@@ -1,9 +1,11 @@
 ﻿namespace BloodBank.Domain.Entities;
 
-public class BaseEntity
+public abstract class BaseEntity
 {
-    public int Id { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set;}
-    public bool IsActive { get; set; }
+    public int Id { get; protected set; }
+    public DateTime CreatedAt { get; protected set; }
+    public DateTime UpdatedAt { get; protected set;}
+    public bool IsActive { get; protected set; }
+
+    protected BaseEntity() { }
 }

@@ -4,8 +4,8 @@ namespace BloodBank.Domain.Entities;
 
 public class BloodStorage : BaseEntity
 {
-    public BloodData BloodData { get; set; }
-    public int AmountInML { get; set; }
+    public BloodData BloodData { get; private set; }
+    public int AmountInML { get; private set; }
 
     protected BloodStorage() { }
 
@@ -37,7 +37,7 @@ public class BloodStorage : BaseEntity
 
     public bool WithdrawAmount(int amountInML)
     {
-        if (AmountInML == 0 &&
+        if (AmountInML == 0 ||
             AmountInML - amountInML < 0)
             return false;
 

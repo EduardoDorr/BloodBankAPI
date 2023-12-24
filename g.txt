@@ -1,0 +1,28 @@
+Adicionar CQRS
+Adicionar MediatR
+Tentar Vertical Slice
+Criar mais ValueObjects
+Reestruturar as pastas
+Pesquisar sobre serviços de domínio
+
+
+
+{
+  "name": "Jeferson Oliveira",
+  "email": "jeferson.oliveira@mail.com",
+  "birthDate": "1983-04-06",
+  "gender": "Males",
+  "weight": 85.45,
+  "bloodType": "A",
+  "rhFactor": "Positive",
+  "address": {
+    "street": "Street G",
+    "city": "City I",
+    "state": "State P",
+    "zipCode": "98753215"
+  }
+}
+
+
+dotnet dev-certs https
+dotnet dev-certs https --trust

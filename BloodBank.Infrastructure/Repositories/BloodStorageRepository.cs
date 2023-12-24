@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
+using BloodBank.Domain.Enums;
 using BloodBank.Domain.Entities;
 using BloodBank.Domain.Interfaces;
 using BloodBank.Infrastructure.Data;
-using BloodBank.Domain.ValueObjects;
 
 namespace BloodBank.Infrastructure.Repositories;
 

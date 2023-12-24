@@ -1,28 +1,29 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-using BloodBank.Application.Donors.Read;
-using BloodBank.Application.Donors.Update;
-using BloodBank.Application.Donors.Create;
-using BloodBank.Application.Donors.Services;
+using MediatR;
+
+using BloodBank.Application.Donors.Models;
+using BloodBank.Application.Donors.Queries;
+using BloodBank.Application.Donors.Commands;
 
 namespace BloodBank.API.Controllers;
 
-[Route("api/v1/[controller]")]
 [ApiController]
+[Route("api/v1/[controller]")]
 public class DonorsController : ControllerBase
 {
-    private readonly IDonorService _donorService;
+    private readonly IMediator _mediator;
 
-    public DonorsController(IDonorService donorService)
+    public DonorsController(IMediator mediator)
     {
-        _donorService = donorService;
+        _mediator = mediator;
     }
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<ReadDonorModel>>> GetAll(int skip = 0, int take  = 50)
+    public async Task<ActionResult<IEnumerable<GetDonorViewModel>>> GetAll(int skip = 0, int take  = 50)
     {
-        var donors = await _donorService.GetAllAsync(skip, take);
+        var donors = await _mediator.Send(new GetDonorsQuery(skip, take));
 
         return Ok(donors);
     }
@@ -30,9 +31,9 @@ public class DonorsController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ReadDonorModel>> GetById(int id)
+    public async Task<ActionResult<GetDonorViewModel>> GetById(int id)
     {
-        var donor = await _donorService.GetByIdAsync(id);
+        var donor = await _mediator.Send(new GetDonorQuery(id));
 
         if (donor is null)
             return NotFound();
@@ -40,12 +41,12 @@ public class DonorsController : ControllerBase
         return Ok(donor);
     }
 
-    [HttpGet("donations/{id}")]
+    [HttpGet("{id}/donations")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ReadDonorWithDonationsModel>> GetWithDonationsById(int id, int take = 50)
+    public async Task<ActionResult<GetDonorWithDonationsViewModel>> GetWithDonationsById(int id, int take = 50)
     {
-        var donor = await _donorService.GetWithDonationsByIdAsync(id, take);
+        var donor = await _mediator.Send(new GetDonorWithDonationsQuery(id, take));
 
         if (donor is null)
             return NotFound();
@@ -53,12 +54,12 @@ public class DonorsController : ControllerBase
         return Ok(donor);
     }
 
-    [HttpGet("last-donation/{id}")]
+    [HttpGet("{id}/last-donation")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ReadDonorWithDonationsModel>> GetWithLastDonationById(int id)
+    public async Task<ActionResult<GetDonorWithDonationsViewModel>> GetWithLastDonationById(int id)
     {
-        var donor = await _donorService.GetWithLastDonationByIdAsync(id);
+        var donor = await _mediator.Send(new GetDonorWithDonationsQuery(id, 1));
 
         if (donor is null)
             return NotFound();
@@ -68,19 +69,19 @@ public class DonorsController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create([FromBody] CreateDonorModel donorInputModel)
+    public async Task<IActionResult> Create([FromBody] CreateDonorCommand command)
     {
-        var donorId = await _donorService.CreateAsync(donorInputModel);
+        var donorId = await _mediator.Send(command);
 
-        return CreatedAtAction(nameof(GetById), new { id = donorId }, donorInputModel);
+        return CreatedAtAction(nameof(GetById), new { id = donorId }, command);
     }
 
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(int id, [FromBody] UpdateDonorModel donorInputModel)
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateDonorInputModel inputModel)
     {
-        var updated = await _donorService.UpdateAsync(id, donorInputModel);
+        var updated = await _mediator.Send(new UpdateDonorCommand(id, inputModel));
 
         if (updated)
             return NoContent();
