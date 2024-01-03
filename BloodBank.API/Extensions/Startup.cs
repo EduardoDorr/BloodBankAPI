@@ -2,6 +2,7 @@
 
 using Microsoft.OpenApi.Models;
 
+using BloodBank.Domain;
 using BloodBank.Application;
 using BloodBank.Infrastructure;
 
@@ -12,7 +13,8 @@ public static class Startup
     public static void ConfigureServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddInfrastructure(builder.Configuration)
-                        .AddApplication();
+                        .AddApplication()
+                        .AddDomain();
 
         builder.Services.AddControllers().AddJsonOptions(options =>
         {

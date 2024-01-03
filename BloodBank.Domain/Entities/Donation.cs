@@ -16,14 +16,14 @@ public class Donation : BaseEntity
 
     protected Donation() { }
 
-    public Donation(Donor donor, int amountInML)
+    public Donation(Donor donor, DateTime donationTime, int amountInML)
     {
         if (!ValidateAmountOfBlood(amountInML))
             throw new ArgumentOutOfRangeException($"The amount of blood must be between {MinimumAmount} and {MaximumAmount} mL");
 
         DonorId = donor.Id;
         BloodData = donor.BloodData;
-        DonationDate = DateTime.Now;
+        DonationDate = donationTime;
         AmountInML = amountInML;
 
         CreatedAt = DateTime.Now;
@@ -42,8 +42,6 @@ public class Donation : BaseEntity
         UpdatedAt = DateTime.Now;
         IsActive = isActive;
     }
-
-    public void SetDonationDate(DateTime donationDate) => DonationDate = donationDate;
 
     private static bool ValidateAmountOfBlood(int amount)
     {

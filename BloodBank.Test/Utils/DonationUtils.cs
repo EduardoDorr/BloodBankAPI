@@ -6,8 +6,7 @@ internal static class DonationUtils
 {
     public static Donation CreateDonation(Donor donor, DateTime donationDate, int amountInML)
     {
-        var donation = new Donation(donor, amountInML);
-        donation.SetDonationDate(donationDate);
+        var donation = new Donation(donor, donationDate, amountInML);
 
         return donation;
     }

@@ -40,7 +40,7 @@ public class BloodStorageService : IBloodStorageService
 
         var withdrawed = stockOfBlood.WithdrawAmount(amountInML);
 
-        if (withdrawed)
+        if (!withdrawed)
             throw new Exception($"The blood type {bloodData.BloodType} {bloodData.RhFactor} does not have enough stock in the storage");
 
         _bloodStorageRepository.Update(stockOfBlood);

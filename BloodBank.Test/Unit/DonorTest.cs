@@ -15,7 +15,7 @@ public class DonorTest
         donor.Donations.Add(DonationUtils.CreateDonation(donor, DateTime.Today.AddDays(-100), 450));
 
         // Act
-        var donation = donor.Donate(450);
+        var donation = donor.CanDonate();
 
         // Assert
         Assert.NotNull(donation);
@@ -32,7 +32,7 @@ public class DonorTest
         donor.Donations.Add(DonationUtils.CreateDonation(donor, DateTime.Today.AddDays(-100), 450));
 
         // Act+Assert
-        Assert.Throws<Exception>(() => donor.Donate(450));
+        Assert.Throws<Exception>(() => donor.CanDonate());
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class DonorTest
         donor.Donations.Add(DonationUtils.CreateDonation(donor, DateTime.Today, 450));
 
         // Act+Assert
-        Assert.Throws<Exception>(() => donor.Donate(450));
+        Assert.Throws<Exception>(() => donor.CanDonate());
     }
 
     [Fact]

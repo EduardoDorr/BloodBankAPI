@@ -15,6 +15,10 @@ public class Donor : BaseEntity
 
     public virtual ICollection<Donation> Donations { get; private set; } = new List<Donation>();
 
+    private const int _minimumWeightToDonate = 50;
+    private const int _dayBetweenDonationsMale = 60;
+    private const int _dayBetweenDonationsFemale = 90;
+
     protected Donor() { }
 
     public Donor(string name, string email, DateTime birthDate, string gender, double weight, string bloodType, string rhFactor, Address address)
@@ -35,15 +39,15 @@ public class Donor : BaseEntity
         IsActive = true;
     }
 
-    public Donation Donate(int amountInML)
+    public bool CanDonate()
     {
         if (IsMinor())
             throw new Exception("Donor is minor and can't donate");
 
-        if (!CanDonate())
+        if (!VerifyTimeBetweenDonations())
             throw new Exception("Donor recently donated and can't donate");
 
-        return new Donation(this, amountInML);
+        return true;
     }
 
     public void Update(string name, string email, DateTime birthDate, string gender, double weight, string bloodType, string rhFactor, Address address, bool isActive)
@@ -60,7 +64,7 @@ public class Donor : BaseEntity
         IsActive = isActive;
     }
 
-    private bool CanDonate()
+    private bool VerifyTimeBetweenDonations()
     {
         if (!Donations.Any())
             return true;
@@ -71,8 +75,8 @@ public class Donor : BaseEntity
 
         return Gender.Type switch
         {
-            GenderType.Male => lastDonationDate < date.AddDays(-60),
-            GenderType.Female => lastDonationDate < date.AddDays(-90),
+            GenderType.Male => lastDonationDate < date.AddDays(-_dayBetweenDonationsMale),
+            GenderType.Female => lastDonationDate < date.AddDays(-_dayBetweenDonationsFemale),
             _ => false,
         };
     }
@@ -86,6 +90,6 @@ public class Donor : BaseEntity
 
     private static bool HasMinimumWeight(double weight)
     {
-        return weight >= 50;
+        return weight >= _minimumWeightToDonate;
     }
 }

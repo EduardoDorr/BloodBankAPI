@@ -2,17 +2,23 @@
 
 using BloodBank.Domain.Interfaces;
 using BloodBank.Application.BloodStorages.Services;
+using BloodBank.Domain.DomainServices;
 
 namespace BloodBank.Application.Donations.Commands.Handlers;
 
 internal sealed class CreateDonationCommandHandler : IRequestHandler<CreateDonationCommand, int>
 {
+    private readonly IDonationService _donationService;
     private readonly IDonorRepository _donorRepository;
     private readonly IDonationRepository _donationRepository;
     private readonly IBloodStorageService _bloodStorageService;
 
-    public CreateDonationCommandHandler(IDonorRepository donorRepository, IDonationRepository donationRepository, IBloodStorageService bloodStorageService)
+    public CreateDonationCommandHandler(IDonationService donationService,
+                                        IDonorRepository donorRepository,
+                                        IDonationRepository donationRepository,
+                                        IBloodStorageService bloodStorageService)
     {
+        _donationService = donationService;
         _donorRepository = donorRepository;
         _donationRepository = donationRepository;
         _bloodStorageService = bloodStorageService;
@@ -25,7 +31,7 @@ internal sealed class CreateDonationCommandHandler : IRequestHandler<CreateDonat
         if (donor is null || !donor.IsActive)
             throw new Exception("An active donor could not be found");
 
-        var donation = donor.Donate(request.AmountInML);
+        var donation = _donationService.CreateDonation(donor, request.DonationDate, request.AmountInML);
 
         _donationRepository.Create(donation);
 
