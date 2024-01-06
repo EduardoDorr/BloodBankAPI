@@ -1,12 +1,13 @@
 ﻿using MediatR;
 
 using BloodBank.Domain.Interfaces;
-using BloodBank.Application.BloodStorages.Services;
+using BloodBank.Domain.DomainResults;
 using BloodBank.Domain.DomainServices;
+using BloodBank.Application.BloodStorages.Services;
 
 namespace BloodBank.Application.Donations.Commands.Handlers;
 
-internal sealed class CreateDonationCommandHandler : IRequestHandler<CreateDonationCommand, int>
+internal sealed class CreateDonationCommandHandler : IRequestHandler<CreateDonationCommand, Result<int>>
 {
     private readonly IDonationService _donationService;
     private readonly IDonorRepository _donorRepository;
@@ -24,14 +25,19 @@ internal sealed class CreateDonationCommandHandler : IRequestHandler<CreateDonat
         _bloodStorageService = bloodStorageService;
     }
 
-    public async Task<int> Handle(CreateDonationCommand request, CancellationToken cancellationToken)
+    public async Task<Result<int>> Handle(CreateDonationCommand request, CancellationToken cancellationToken)
     {
         var donor = await _donorRepository.GetWithDonationsByIdAsync(request.DonorId, 1);
 
         if (donor is null || !donor.IsActive)
             throw new Exception("An active donor could not be found");
 
-        var donation = _donationService.CreateDonation(donor, request.DonationDate, request.AmountInML);
+        var donationResult = _donationService.CreateDonation(donor, request.DonationDate, request.AmountInML);
+
+        if (!donationResult.Success)
+            return Result<int>.Fail(donationResult.Errors);
+
+        var donation = donationResult.Value;
 
         _donationRepository.Create(donation);
 
@@ -43,6 +49,6 @@ internal sealed class CreateDonationCommandHandler : IRequestHandler<CreateDonat
         if (!created)
             throw new Exception("Donation could not be created");
 
-        return donation.Id;
+        return donation.Id.ToResult();
     }
 }

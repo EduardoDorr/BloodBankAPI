@@ -1,5 +1,7 @@
 ﻿using BloodBank.Domain.Enums;
 using BloodBank.Domain.ValueObjects;
+using BloodBank.Domain.DomainResults;
+using BloodBank.Domain.DomainErrors;
 
 namespace BloodBank.Domain.Entities;
 
@@ -39,15 +41,15 @@ public class Donor : BaseEntity
         IsActive = true;
     }
 
-    public bool CanDonate()
+    public Result CanDonate()
     {
         if (IsMinor())
-            throw new Exception("Donor is minor and can't donate");
+            return Result.Fail(DonorErrors.IsMinor);
 
         if (!VerifyTimeBetweenDonations())
-            throw new Exception("Donor recently donated and can't donate");
+            return Result.Fail(DonorErrors.DonatedRecently);
 
-        return true;
+        return Result.Ok();
     }
 
     public void Update(string name, string email, DateTime birthDate, string gender, double weight, string bloodType, string rhFactor, Address address, bool isActive)

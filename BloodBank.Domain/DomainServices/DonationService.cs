@@ -1,14 +1,17 @@
 ﻿using BloodBank.Domain.Entities;
+using BloodBank.Domain.DomainResults;
 
 namespace BloodBank.Domain.DomainServices;
 
 public class DonationService : IDonationService
 {
-    public Donation CreateDonation(Donor donor, DateTime donationDate, int amountInML)
+    public Result<Donation> CreateDonation(Donor donor, DateTime donationDate, int amountInML)
     {
-        if (!donor.CanDonate())
-            throw new Exception("Donor can't donate");
+        var canDonateResult = donor.CanDonate();
 
-        return new Donation(donor, donationDate, amountInML);
+        if (!canDonateResult.Success)
+            return Result<Donation>.Fail(canDonateResult.Errors);
+
+        return Result<Donation>.Ok(new Donation(donor, donationDate, amountInML));
     }
 }

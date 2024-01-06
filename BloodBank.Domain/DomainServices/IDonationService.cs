@@ -1,8 +1,9 @@
 ﻿using BloodBank.Domain.Entities;
+using BloodBank.Domain.DomainResults;
 
 namespace BloodBank.Domain.DomainServices;
 
 public interface IDonationService
 {
-    Donation CreateDonation(Donor donor, DateTime donationDate, int amountInML);
+    Result<Donation> CreateDonation(Donor donor, DateTime donationDate, int amountInML);
 }

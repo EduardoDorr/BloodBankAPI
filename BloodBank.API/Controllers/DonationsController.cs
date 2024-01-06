@@ -54,9 +54,12 @@ public class DonationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create([FromBody] CreateDonationCommand command)
     {
-        var donationId = await _mediator.Send(command);
+        var result = await _mediator.Send(command);
 
-        return CreatedAtAction(nameof(GetById), new { id = donationId }, command);
+        if (!result.Success)
+            return BadRequest(result.Errors);
+
+        return CreatedAtAction(nameof(GetById), new { id = result.Value }, command);
     }
 
     [HttpPut("{id}")]

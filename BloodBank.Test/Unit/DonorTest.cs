@@ -18,7 +18,7 @@ public class DonorTest
         var donation = donor.CanDonate();
 
         // Assert
-        Assert.NotNull(donation);
+        Assert.True(donation.Success);
     }
 
     [Fact]
@@ -32,7 +32,7 @@ public class DonorTest
         donor.Donations.Add(DonationUtils.CreateDonation(donor, DateTime.Today.AddDays(-100), 450));
 
         // Act+Assert
-        Assert.Throws<Exception>(() => donor.CanDonate());
+        Assert.False(donor.CanDonate().Success);
     }
 
     [Fact]
@@ -41,12 +41,12 @@ public class DonorTest
         // Arrange
         var address = AddressUtils.CreateAValidAddress();
 
-        var donor = DonorUtils.CreateDonor(new DateTime(2006, 11, 8), 70.00, address);
+        var donor = DonorUtils.CreateDonor(new DateTime(2005, 11, 8), 70.00, address);
 
         donor.Donations.Add(DonationUtils.CreateDonation(donor, DateTime.Today, 450));
 
         // Act+Assert
-        Assert.Throws<Exception>(() => donor.CanDonate());
+        Assert.False(donor.CanDonate().Success);
     }
 
     [Fact]
