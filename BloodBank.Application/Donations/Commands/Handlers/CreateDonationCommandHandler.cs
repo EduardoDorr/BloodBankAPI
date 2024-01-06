@@ -49,6 +49,6 @@ internal sealed class CreateDonationCommandHandler : IRequestHandler<CreateDonat
         if (!created)
             throw new Exception("Donation could not be created");
 
-        return donation.Id.ToResult();
+        return donation.Id;
     }
 }

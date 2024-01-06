@@ -52,6 +52,7 @@ public class DonationsController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] CreateDonationCommand command)
     {
         var result = await _mediator.Send(command);
@@ -64,6 +65,7 @@ public class DonationsController : ControllerBase
 
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateDonationInputModel donationInputModel)
     {
