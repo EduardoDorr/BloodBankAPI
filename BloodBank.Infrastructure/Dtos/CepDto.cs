@@ -5,22 +5,22 @@ namespace BloodBank.Infrastructure.Dtos;
 public class CepDto
 {
     [JsonPropertyName("cep")]
-    public string Cep { get; set; }
+    public string PostalCode { get; set; }
 
     [JsonPropertyName("logradouro")]
-    public string Logradouro { get; set; }
+    public string Street { get; set; }
 
     [JsonPropertyName("complemento")]
     public string Complemento { get; set; }
 
     [JsonPropertyName("bairro")]
-    public string Bairro { get; set; }
+    public string District { get; set; }
 
     [JsonPropertyName("localidade")]
     public string Localidade { get; set; }
 
     [JsonPropertyName("uf")]
-    public string Uf { get; set; }
+    public string State { get; set; }
 
     [JsonPropertyName("ibge")]
     public string Ibge { get; set; }

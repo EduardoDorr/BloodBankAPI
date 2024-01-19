@@ -25,7 +25,7 @@ namespace BloodBank.API.Controllers
             {
                 address = await _cepRepository.GetByCepAsync(cep);
 
-                if (address?.Cep is null)
+                if (address?.PostalCode is null)
                     return BadRequest("CEP does not exist");
             }
             catch
