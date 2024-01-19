@@ -4,6 +4,7 @@ using BloodBank.Domain.Interfaces;
 using BloodBank.Domain.DomainResults;
 using BloodBank.Domain.DomainServices;
 using BloodBank.Application.BloodStorages.Services;
+using BloodBank.Domain.DomainErrors;
 
 namespace BloodBank.Application.Donations.Commands.Handlers;
 
@@ -30,7 +31,7 @@ internal sealed class CreateDonationCommandHandler : IRequestHandler<CreateDonat
         var donor = await _donorRepository.GetWithDonationsByIdAsync(request.DonorId, 1);
 
         if (donor is null || !donor.IsActive)
-            throw new Exception("An active donor could not be found");
+            return DonorErrors.NotFound;
 
         var donationResult = _donationService.CreateDonation(donor, request.DonationDate, request.AmountInML);
 
@@ -47,7 +48,7 @@ internal sealed class CreateDonationCommandHandler : IRequestHandler<CreateDonat
         var created = await _donationRepository.SaveChangesAsync();
 
         if (!created)
-            throw new Exception("Donation could not be created");
+            return DonationErrors.CannotBeCreated;
 
         return donation.Id;
     }

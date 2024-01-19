@@ -1,6 +1,7 @@
 ﻿using MediatR;
 
 using BloodBank.Application.Addresses.Models;
+using BloodBank.Domain.DomainResults;
 
 namespace BloodBank.Application.Donors.Commands;
 
@@ -11,4 +12,4 @@ public sealed record CreateDonorCommand(string Name,
                                         double Weight,
                                         string BloodType,
                                         string RhFactor,
-                                        AddressModel Address) : IRequest<int>;
+                                        AddressModel Address) : IRequest<Result<int>>;

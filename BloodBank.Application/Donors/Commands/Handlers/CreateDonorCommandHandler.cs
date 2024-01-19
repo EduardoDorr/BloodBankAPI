@@ -3,10 +3,12 @@ using AutoMapper;
 
 using BloodBank.Domain.Entities;
 using BloodBank.Domain.Interfaces;
+using BloodBank.Domain.DomainResults;
+using BloodBank.Domain.DomainErrors;
 
 namespace BloodBank.Application.Donors.Commands.Handlers;
 
-internal sealed class CreateDonorCommandHandler : IRequestHandler<CreateDonorCommand, int>
+internal sealed class CreateDonorCommandHandler : IRequestHandler<CreateDonorCommand, Result<int>>
 {
     private readonly IDonorRepository _donorRepository;
     private readonly IMapper _mapper;
@@ -17,7 +19,7 @@ internal sealed class CreateDonorCommandHandler : IRequestHandler<CreateDonorCom
         _mapper = mapper;
     }
 
-    public async Task<int> Handle(CreateDonorCommand request, CancellationToken cancellationToken)
+    public async Task<Result<int>> Handle(CreateDonorCommand request, CancellationToken cancellationToken)
     {
         var donor = _mapper.Map<Donor>(request);
 
@@ -26,7 +28,7 @@ internal sealed class CreateDonorCommandHandler : IRequestHandler<CreateDonorCom
         var created = await _donorRepository.SaveChangesAsync();
 
         if (!created)
-            throw new Exception("Donor could not be created");
+            return DonorErrors.CannotBeCreated;
 
         return donor.Id;
     }

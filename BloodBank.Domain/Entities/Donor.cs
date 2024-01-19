@@ -1,7 +1,7 @@
 ﻿using BloodBank.Domain.Enums;
 using BloodBank.Domain.ValueObjects;
-using BloodBank.Domain.DomainResults;
 using BloodBank.Domain.DomainErrors;
+using BloodBank.Domain.DomainResults;
 
 namespace BloodBank.Domain.Entities;
 
